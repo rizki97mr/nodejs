@@ -39,7 +39,6 @@ router.delete('/product/:id', async (req, res) => {
 
 router.get('/product', async (req, res) => {
     const {search} = req.query;
-    let {exec} = {};
     try {
         console.log(req.params)
         const product = await Product.findAll({
@@ -49,7 +48,10 @@ router.get('/product', async (req, res) => {
                 }
             }
         })
-        res.send(product);
+        res.send({
+            status: 'success',
+            response: (product)
+        });
     }catch(e) {
         res.send(e);
     }
@@ -63,7 +65,10 @@ router.get('/product/:id', async (req, res) => {
                 id: req.params.id
             }
         })
-        res.send({product});
+        res.send({
+            status: 'success',
+            response: (product)
+        });
     }catch(e) {
         res.send(e);
     }
@@ -95,22 +100,5 @@ router.put('/product/:id', upload.single('image'), async (req, res) => {
         res.send(e);
     }
 });
-
-const _response = (res) => {
-    return (error, result) => {
-        if(error) {
-            res.send({
-                status: 'failed',
-                response: error
-            });
-        }else {
-            res.send({
-                status: 'success',
-                response: result
-            });
-        }
-    }
-}
-
 
 module.exports = router;
