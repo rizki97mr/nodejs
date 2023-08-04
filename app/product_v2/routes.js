@@ -17,7 +17,10 @@ router.post('/product', upload.single('image'),async (req, res) => {
     try {
         await Product.sync();
         const result = await Product.create({users_id, name, price, stock, status, image_url: `http://localhost:5000/public/${image.originalname}`});
-        res.send(result);
+        res.send({
+            status: 'success',
+            response: (result)
+        });
     }catch(e) {
         res.send(e);
     }  
@@ -26,12 +29,15 @@ router.post('/product', upload.single('image'),async (req, res) => {
 router.delete('/product/:id', async (req, res) => {
     try {
         console.log(req.params)
-        await Product.destroy({
+        const product = await Product.destroy({
             where: {
                 id: req.params.id
             }
         })
-        res.send('success');
+        res.send({
+            status: 'success',
+            response: (product)
+        })
     }catch(e) {
         res.send(e);
     }
@@ -60,14 +66,14 @@ router.get('/product', async (req, res) => {
 router.get('/product/:id', async (req, res) => {
     try {
         console.log(req.params)
-        const product = await Product.findOne({
+        const result = await Product.findOne({
             where: {
                 id: req.params.id
             }
         })
         res.send({
             status: 'success',
-            response: (product)
+            response: (result)
         });
     }catch(e) {
         res.send(e);
@@ -82,11 +88,15 @@ router.put('/product/:id', upload.single('image'), async (req, res) => {
         if(image) {
             const target = path.join(__dirname, '../../uploads', image.originalname);
             fs.renameSync(image.path, target);
-            await Product.update({users_id, name, price, stock, status, image_url:`http://localhost:5000/public/${image.originalname}`},{
+            const result = await Product.update({users_id, name, price, stock, status, image_url:`http://localhost:5000/public/${image.originalname}`},{
                 where: {
                     id: req.params.id
                 }
-            })       
+            })   
+            res.send({
+                status: 'success',
+                response: (result)
+            });    
         }else {
             await Product.update({users_id, name, price, stock, status},{
                 where: {
@@ -94,7 +104,6 @@ router.put('/product/:id', upload.single('image'), async (req, res) => {
                 }
             })
         }       
-        res.send('success');
     }catch(e) {
         console.log(e);
         res.send(e);
